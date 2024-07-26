@@ -1,5 +1,4 @@
-import { Home, MessageCircle } from "lucide-react";
-import Index from "./pages/Index.jsx";
+import { MessageCircle } from "lucide-react";
 import WhatsAppClone from "./pages/WhatsAppClone.jsx";
 
 /**
@@ -7,14 +6,8 @@ import WhatsAppClone from "./pages/WhatsAppClone.jsx";
  */
 export const navItems = [
   {
-    title: "Home",
-    to: "/",
-    icon: <Home className="h-4 w-4" />,
-    page: <Index />,
-  },
-  {
     title: "WhatsApp Clone",
-    to: "/whatsapp",
+    to: "/",
     icon: <MessageCircle className="h-4 w-4" />,
     page: <WhatsAppClone />,
   },
