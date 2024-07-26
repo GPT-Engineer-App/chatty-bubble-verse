@@ -1,14 +1,14 @@
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import { Send, Search } from 'lucide-react';
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
 
 const contacts = [
-  { id: 1, name: "Alice", avatar: "https://i.pravatar.cc/150?img=1" },
-  { id: 2, name: "Bob", avatar: "https://i.pravatar.cc/150?img=2" },
-  { id: 3, name: "Charlie", avatar: "https://i.pravatar.cc/150?img=3" },
-  { id: 4, name: "David", avatar: "https://i.pravatar.cc/150?img=4" },
+  { id: 1, name: "Alice", avatar: "https://i.pravatar.cc/150?img=1", online: true },
+  { id: 2, name: "Bob", avatar: "https://i.pravatar.cc/150?img=2", online: false },
+  { id: 3, name: "Charlie", avatar: "https://i.pravatar.cc/150?img=3", online: true },
+  { id: 4, name: "David", avatar: "https://i.pravatar.cc/150?img=4", online: false },
 ];
 
 const initialMessages = {
@@ -35,6 +35,27 @@ const WhatsAppClone = () => {
   const [messages, setMessages] = useState(initialMessages);
   const [newMessage, setNewMessage] = useState("");
   const [searchTerm, setSearchTerm] = useState("");
+  const [contactList, setContactList] = useState(contacts);
+
+  useEffect(() => {
+    const interval = setInterval(() => {
+      setContactList(prevContacts => 
+        prevContacts.map(contact => ({
+          ...contact,
+          online: Math.random() > 0.5
+        }))
+      );
+    }, 5000);
+
+    return () => clearInterval(interval);
+  }, []);
+
+  useEffect(() => {
+    const updatedActiveContact = contactList.find(contact => contact.id === activeContact.id);
+    if (updatedActiveContact) {
+      setActiveContact(updatedActiveContact);
+    }
+  }, [contactList]);
 
   const handleSendMessage = (e) => {
     e.preventDefault();
@@ -51,7 +72,7 @@ const WhatsAppClone = () => {
     }
   };
 
-  const filteredContacts = contacts.filter((contact) =>
+  const filteredContacts = contactList.filter((contact) =>
     contact.name.toLowerCase().includes(searchTerm.toLowerCase())
   );
 
@@ -78,10 +99,15 @@ const WhatsAppClone = () => {
               }`}
               onClick={() => setActiveContact(contact)}
             >
-              <Avatar className="h-10 w-10 mr-3">
-                <AvatarImage src={contact.avatar} alt={contact.name} />
-                <AvatarFallback>{contact.name[0]}</AvatarFallback>
-              </Avatar>
+              <div className="relative">
+                <Avatar className="h-10 w-10 mr-3">
+                  <AvatarImage src={contact.avatar} alt={contact.name} />
+                  <AvatarFallback>{contact.name[0]}</AvatarFallback>
+                </Avatar>
+                {contact.online && (
+                  <span className="absolute bottom-0 right-3 w-3 h-3 bg-green-500 rounded-full border-2 border-white"></span>
+                )}
+              </div>
               <span>{contact.name}</span>
             </div>
           ))}
@@ -91,11 +117,19 @@ const WhatsAppClone = () => {
       {/* Chat area */}
       <div className="flex flex-col flex-1">
         <div className="bg-green-500 p-4 text-white flex items-center">
-          <Avatar className="h-10 w-10 mr-3">
-            <AvatarImage src={activeContact.avatar} alt={activeContact.name} />
-            <AvatarFallback>{activeContact.name[0]}</AvatarFallback>
-          </Avatar>
-          <h1 className="text-xl font-bold">{activeContact.name}</h1>
+          <div className="relative">
+            <Avatar className="h-10 w-10 mr-3">
+              <AvatarImage src={activeContact.avatar} alt={activeContact.name} />
+              <AvatarFallback>{activeContact.name[0]}</AvatarFallback>
+            </Avatar>
+            {activeContact.online && (
+              <span className="absolute bottom-0 right-3 w-3 h-3 bg-green-500 rounded-full border-2 border-white"></span>
+            )}
+          </div>
+          <div>
+            <h1 className="text-xl font-bold">{activeContact.name}</h1>
+            <p className="text-sm">{activeContact.online ? 'Online' : 'Offline'}</p>
+          </div>
         </div>
         <div className="flex-1 overflow-y-auto p-4 space-y-4">
           {messages[activeContact.id].map((message) => (
